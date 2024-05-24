@@ -8,6 +8,7 @@
         >
       </div>
       <p v-if="isLoading">Loading</p>
+      <p v-else-if="!isLoading && error">{{ error }}</p>
       <p v-else-if="results.length == 0">No data found!</p>
       <ul v-else>
         <survey-result
@@ -33,11 +34,13 @@ export default {
     return {
       results: [],
       isLoading: false,
+      error: null,
     };
   },
   methods: {
     loadExperiences() {
       this.isLoading = true;
+      this.error = null;
       fetch('https://react-kurs-771f0-default-rtdb.firebaseio.com/surveys.json')
         .then((res) => {
           if (res.ok) {
@@ -51,6 +54,11 @@ export default {
             res.push({ id: id, name: data[id].name, rating: data[id].rating });
           }
           this.results = res;
+        })
+        .catch((err) => {
+          this.isLoading = false;
+          console.log(err);
+          this.error = 'Failed to fetch data';
         });
     },
   },
